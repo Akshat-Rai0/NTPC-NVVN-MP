@@ -1,6 +1,3 @@
-latitude,longitude,elevation,utc_offset_seconds,timezone,timezone_abbreviation
-23.233742,77.35849,525.0,19800,Asia/Kolkata,GMT+5:30
-
 time,apparent_temperature (°C)
 2024-01-01T00:00,17.3
 2024-01-01T01:00,16.7
