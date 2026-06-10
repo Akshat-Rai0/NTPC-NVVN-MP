@@ -1,0 +1,10 @@
+lightgbm
+pandas
+numpy
+requests
+urllib3
+requests-cache
+retry-requests
+openmeteo-requests
+holidays
+pytest
