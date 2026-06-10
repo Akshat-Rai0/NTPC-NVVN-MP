@@ -1,0 +1,2 @@
+timestamp,actual_demand,predicted_demand,temp_weighted,month,holiday,is_weekend,hour,minute,y_lag_1,y_lag_24h,y_lag_7d
+2026-06-10 11:00:00,12134.0,12154.365342811992,39.620211601257324,6,0,0,11,0,12134.0,12012.66,11891.32
