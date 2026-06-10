@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Power Demand Predictor</title>
+  <link rel="stylesheet" href="/static/dashboard/css/dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="header">
+      <div class="header-left">
+        <h1>Energy Forecast</h1>
+        <p class="subtitle">Live and forecasted power demand across Indian states</p>
+      </div>
+      <div class="header-right">
+        <label for="state-select">Select State</label>
+        <select id="state-select"></select>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-view="today">Today</button>
+      <button class="tab" data-view="tomorrow">Tomorrow</button>
+      <button class="tab" data-view="future">Future date</button>
+      <button class="tab" data-view="history">Previous day</button>
+      <input type="date" id="date-picker" class="date-picker hidden">
+    </nav>
+
+    <section id="metrics-panel" class="metrics-panel hidden">
+      <div class="metric-card">
+        <span class="metric-label">Live Load</span>
+        <span class="metric-value" id="metric-live-load">—</span>
+        <span class="metric-sub" id="metric-live-window">—</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Current Predicted Load</span>
+        <span class="metric-value" id="metric-current-pred">—</span>
+        <span class="metric-sub" id="metric-current-temp">—</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Predicted Peak Load</span>
+        <span class="metric-value" id="metric-peak-pred">—</span>
+        <span class="metric-sub" id="metric-peak-detail">—</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Avg. MAPE</span>
+        <span class="metric-value" id="metric-avg-mape">—</span>
+        <span class="metric-sub">Cumulative for today</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Active MAPE</span>
+        <span class="metric-value" id="metric-active-mape">—</span>
+        <span class="metric-sub" id="metric-active-window">—</span>
+      </div>
+    </section>
+
+    <section class="chart-panel" id="chart-panel">
+      <div class="chart-header">
+        <div>
+          <h2 id="chart-title">Live vs Predicted Load</h2>
+          <p id="chart-subtitle" class="chart-subtitle"></p>
+        </div>
+        <div class="chart-actions">
+          <button id="btn-info" title="Info">i</button>
+          <button id="btn-download" title="Download CSV">↓</button>
+          <button id="btn-fullscreen" title="Fullscreen">⛶</button>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="demand-chart"></canvas>
+      </div>
+      <div id="peak-label" class="peak-label hidden"></div>
+      <div id="info-tooltip" class="info-tooltip hidden">
+        Actual demand is shown only where live MERIT India data exists (blue).
+        Predicted load is shown for the full day (orange). Chart refreshes every 5 minutes.
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span id="last-updated">—</span>
+      <span id="refresh-countdown"></span>
+    </footer>
+  </div>
+
+  <script src="/static/dashboard/js/chart.js"></script>
+</body>
+</html>
