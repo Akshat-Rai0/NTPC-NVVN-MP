@@ -1,3 +1,6 @@
+django>=5.0
+django-apscheduler
+pyyaml
 lightgbm
 pandas
 numpy

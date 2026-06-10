@@ -1,0 +1,32 @@
+code: mp
+name: Madhya Pradesh
+merit_state_code: MPD
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=MPD
+model_path: models/mp/lgbm_final.txt
+fallback_demand_mw: 14500
+timezone: Asia/Kolkata
+cities:
+  indore:
+    lat: 22.7196
+    lon: 75.8577
+    weight: 0.292095
+  bhopal:
+    lat: 23.2599
+    lon: 77.4126
+    weight: 0.21238938
+  jabalpur:
+    lat: 23.1815
+    lon: 79.9864
+    weight: 0.15929204
+  gwalior:
+    lat: 26.2183
+    lon: 78.1828
+    weight: 0.12389381
+  ujjain:
+    lat: 23.1765
+    lon: 75.7885
+    weight: 0.09734513
+  singrauli:
+    lat: 24.1998
+    lon: 82.6754
+    weight: 0.11504425
