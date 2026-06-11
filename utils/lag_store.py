@@ -11,6 +11,7 @@ import logging
 import os
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
+from filelock import FileLock
 
 import pandas as pd
 
@@ -120,17 +121,19 @@ def write_demand(
     source: str = "api",
     config: StateConfig | None = None,
 ) -> None:
-    df = _load(config)
-    ts = _align_15min(timestamp)
-    df = df[df["timestamp"] != ts]
-    new_row = pd.DataFrame([{
-        "timestamp": ts,
-        "demand_mw": round(demand_mw, 2),
-        "source": source,
-    }])
-    df = pd.concat([df, new_row], ignore_index=True)
-    df.sort_values("timestamp", inplace=True)
-    _save(df, config)
+    path = _csv_path(config)
+    with FileLock(str(path) + ".lock"):
+        df = _load(config)
+        ts = _align_15min(timestamp)
+        df = df[df["timestamp"] != ts]
+        new_row = pd.DataFrame([{
+            "timestamp": ts,
+            "demand_mw": round(demand_mw, 2),
+            "source": source,
+        }])
+        df = pd.concat([df, new_row], ignore_index=True)
+        df.sort_values("timestamp", inplace=True)
+        _save(df, config)
 
 
 def _exact_lookup(df: pd.DataFrame, ts: pd.Timestamp) -> float | None:
