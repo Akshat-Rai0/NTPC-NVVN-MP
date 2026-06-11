@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from functools import lru_cache
+from pathlib import Path
 
 import lightgbm as lgb
 import pandas as pd
@@ -30,9 +31,18 @@ FEATURE_COLS = [
 ]
 
 
+_model_mtime: dict[str, float] = {}
+
 @lru_cache(maxsize=32)
-def _load_model(model_path: str) -> lgb.Booster:
+def _load_model_cached(model_path: str) -> lgb.Booster:
     return lgb.Booster(model_file=model_path)
+
+def _load_model(model_path: str) -> lgb.Booster:
+    mtime = Path(model_path).stat().st_mtime
+    if _model_mtime.get(model_path) != mtime:
+        _model_mtime[model_path] = mtime
+        _load_model_cached.cache_clear()
+    return _load_model_cached(model_path)
 
 
 def _to_local_naive(dt: datetime) -> datetime:
