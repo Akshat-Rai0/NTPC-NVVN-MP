@@ -61,7 +61,23 @@ class StatePredictor:
     def __init__(self, state_code: str):
         self.config = StateRegistry.get(state_code)
         self.state = State.objects.get(code=state_code.lower())
+        self._warm_lag_store()
 
+    def _warm_lag_store(self) -> None:
+        """Pre-populate lag store from DB so lag lookups work at cold start."""
+        latest = (
+            DemandReading.objects
+            .filter(state=self.state)
+            .order_by("-timestamp")
+            .first()
+        )
+        if latest is not None:
+            write_demand(
+                _to_local_naive(latest.timestamp),
+                latest.demand_mw,
+                source="db",
+                config=self.config,
+            )
     def predict_at(
         self,
         dt: datetime | None = None,
@@ -104,20 +120,22 @@ class StatePredictor:
             sync_demand_reading(reading)
 
         result = self.predict_at(fetch_time, allow_api=True)
-        record = PredictionRecord.objects.create(
+        record, _ = PredictionRecord.objects.update_or_create(
             state=self.state,
             timestamp=aligned,
-            actual_demand=actual,
-            predicted_demand=result["predicted_demand"],
-            temp_weighted=result["features"]["temp_weighted"],
-            month=result["features"]["month"],
-            holiday=result["features"]["holiday"],
-            is_weekend=result["features"]["is_weekend"],
-            hour=result["features"]["hour"],
-            minute=result["features"]["minute"],
-            y_lag_1=result["features"]["y_lag_1"],
-            y_lag_24h=result["features"]["y_lag_24h"],
-            y_lag_7d=result["features"]["y_lag_7d"],
+            defaults={
+                "actual_demand": actual,
+                "predicted_demand": result["predicted_demand"],
+                "temp_weighted": result["features"]["temp_weighted"],
+                "month": result["features"]["month"],
+                "holiday": result["features"]["holiday"],
+                "is_weekend": result["features"]["is_weekend"],
+                "hour": result["features"]["hour"],
+                "minute": result["features"]["minute"],
+                "y_lag_1": result["features"]["y_lag_1"],
+                "y_lag_24h": result["features"]["y_lag_24h"],
+                "y_lag_7d": result["features"]["y_lag_7d"],
+            },
         )
         sync_prediction_record(record)
 
