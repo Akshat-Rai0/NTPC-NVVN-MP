@@ -22,6 +22,19 @@ log = logging.getLogger(__name__)
 COLUMNS = ["timestamp", "demand_mw", "source"]
 NEIGHBOUR_WINDOW = timedelta(minutes=30)
 
+# Empirical decay factors for lag fallback resolution.
+# When the exact historical value is unavailable and we fall back to a
+# proxy (API live value, most-recent reading, or hardcoded constant),
+# we apply a small decay to reflect that demand from 24h/7d ago is not
+# a perfect proxy for the current slot.
+#   LAG_DECAY_24H = 0.99 → assume ~1% day-over-day drift
+#   LAG_DECAY_7D  = 0.98 → assume ~2% week-over-week drift
+# The secondary decay in get_lag_features (applied when src == "constant")
+# is intentional: it replaces the constant fallback with a lag_1-derived
+# estimate, using the same decay to keep the feature scale consistent with
+# what the model saw during training.
+LAG_DECAY_24H = 0.99
+LAG_DECAY_7D  = 0.98
 _DEFAULT_MERIT_URL = (
     "https://meritindia.in/StateWiseDetails/"
     "BindCurrentStateStatus?StateCode=MPD"
@@ -187,7 +200,6 @@ def _resolve_lag(
         return recent * decay, f"recent×{decay}"
 
     return cfg.fallback_demand_mw * decay, "constant"
-
 def get_lag_features(
     now: datetime | None = None,
     config: StateConfig | None = None,
@@ -222,7 +234,7 @@ def get_lag_features(
     lag_24h, src_24h = _resolve_lag(
         df,
         now - timedelta(hours=24),
-        0.99,
+        LAG_DECAY_24H,
         "y_lag_24h",
         config,
         override_value=chain_override(now - timedelta(hours=24)),
@@ -231,24 +243,27 @@ def get_lag_features(
     lag_7d,  src_7d  = _resolve_lag(
         df,
         now - timedelta(days=7),
-        0.98,
+        LAG_DECAY_7D,
         "y_lag_7d",
         config,
         override_value=chain_override(now - timedelta(days=7)),
         allow_api=allow_api,
     )
 
+    # When lag resolved to the hardcoded constant fallback, derive a better
+    # estimate from lag_1 using the same decay. This keeps the feature in a
+    # realistic range rather than anchoring to 14,500 MW regardless of
+    # current load conditions.
     if src_24h == "constant" and lag_1:
-        lag_24h = lag_1 * 0.99
+        lag_24h = lag_1 * LAG_DECAY_24H
     if src_7d == "constant" and lag_1:
-        lag_7d = lag_1 * 0.98
+        lag_7d = lag_1 * LAG_DECAY_7D
 
     return {
         "y_lag_1": round(lag_1, 2),
         "y_lag_24h": round(lag_24h, 2),
         "y_lag_7d": round(lag_7d, 2),
     }
-
 def cfg_fallback(config: StateConfig | None) -> float:
     cfg = config or _default_config()
     return cfg.fallback_demand_mw
