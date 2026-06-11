@@ -188,7 +188,6 @@ def _resolve_lag(
 
     return cfg.fallback_demand_mw * decay, "constant"
 
-
 def get_lag_features(
     now: datetime | None = None,
     config: StateConfig | None = None,
@@ -211,7 +210,7 @@ def get_lag_features(
                 return value
         return None
 
-    lag_1, _ = _resolve_lag(
+    lag_1,   src_1   = _resolve_lag(
         df,
         now - timedelta(minutes=15),
         1.00,
@@ -220,7 +219,7 @@ def get_lag_features(
         override_value=chain_override(now - timedelta(minutes=15)),
         allow_api=allow_api,
     )
-    lag_24h, _ = _resolve_lag(
+    lag_24h, src_24h = _resolve_lag(
         df,
         now - timedelta(hours=24),
         0.99,
@@ -229,7 +228,7 @@ def get_lag_features(
         override_value=chain_override(now - timedelta(hours=24)),
         allow_api=allow_api,
     )
-    lag_7d, _ = _resolve_lag(
+    lag_7d,  src_7d  = _resolve_lag(
         df,
         now - timedelta(days=7),
         0.98,
@@ -239,10 +238,9 @@ def get_lag_features(
         allow_api=allow_api,
     )
 
-    fallback = cfg_fallback(config)
-    if lag_24h >= fallback * 0.99 and lag_1:
+    if src_24h == "constant" and lag_1:
         lag_24h = lag_1 * 0.99
-    if lag_7d >= fallback * 0.98 and lag_1:
+    if src_7d == "constant" and lag_1:
         lag_7d = lag_1 * 0.98
 
     return {
@@ -250,7 +248,6 @@ def get_lag_features(
         "y_lag_24h": round(lag_24h, 2),
         "y_lag_7d": round(lag_7d, 2),
     }
-
 
 def cfg_fallback(config: StateConfig | None) -> float:
     cfg = config or _default_config()
