@@ -11,3 +11,4 @@ retry-requests
 openmeteo-requests
 holidays
 pytest
+python-dotenv>=1.0
