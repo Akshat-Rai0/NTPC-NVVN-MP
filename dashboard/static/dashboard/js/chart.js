@@ -346,7 +346,9 @@
 
   async function fetchStates() {
     const res = await fetch("/api/states/");
+    if (!res.ok) throw new Error(`States API returned ${res.status}`);
     const data = await res.json();
+    if (!data.states || !data.states.length) throw new Error("No active states returned");
     stateSelect.innerHTML = "";
     data.states.forEach((s) => {
       const opt = document.createElement("option");
@@ -499,7 +501,14 @@
   });
 
   async function init() {
-    await fetchStates();
+    try {
+      await fetchStates();
+    } catch (err) {
+      lastUpdated.textContent = `API unavailable: ${err.message}`;
+      chartTitle.textContent = "Dashboard unavailable";
+      if (chartSubtitle) chartSubtitle.textContent = "Check that the Django server is running";
+      return;
+    }
     setupDatePicker();
     setupRefreshTimer();
     setupCountdown();
