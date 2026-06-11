@@ -1,2 +1,0 @@
-- [ ] add SQL database for lags
-- [ ] make the weather api handling more robust
