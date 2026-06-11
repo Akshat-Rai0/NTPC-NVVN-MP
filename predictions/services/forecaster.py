@@ -51,14 +51,16 @@ class DayForecaster:
         self.predictor = StatePredictor(state_code)
         self.config = StateRegistry.get(state_code)
         self.state = self.predictor.state
-        self._actual_cache: dict[datetime, float] | None = None
-        self._live_actual_cache: dict[datetime, float] | None = None
-        self._predicted_cache: dict[datetime, float] | None = None
-        self._temp_cache: dict[datetime, float] | None = None
+        self._cache_date: date | None = None
+        self._actual_cache: dict[datetime, float] = {}
+        self._live_actual_cache: dict[datetime, float] = {}
+        self._predicted_cache: dict[datetime, float] = {}
+        self._temp_cache: dict[datetime, float] = {}
 
     def _load_day_caches(self, target: date) -> None:
-        if self._actual_cache is not None:
+        if self._cache_date == target:
             return
+        self._cache_date = target
         self._actual_cache = {}
         self._live_actual_cache = {}
         self._predicted_cache = {}
