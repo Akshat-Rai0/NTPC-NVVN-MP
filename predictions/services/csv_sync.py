@@ -9,21 +9,37 @@ import pandas as pd
 from predictions.services.registry import StateRegistry
 from states.models import DemandReading, PredictionRecord
 
+DEMAND_COLUMNS = ["timestamp", "demand_mw", "source"]
+PREDICTION_COLUMNS = [
+    "timestamp", "actual_demand", "predicted_demand", "temp_weighted",
+    "month", "holiday", "is_weekend", "hour", "minute",
+    "y_lag_1", "y_lag_24h", "y_lag_7d",
+]
+
 
 def _ensure_dir(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
 
-def _append_row(path: Path, row: dict) -> None:
-    """Append a single row to CSV, writing header only if file doesn't exist yet."""
-    df = pd.DataFrame([row])
+def _seed_header(path: Path, columns: list[str]) -> None:
+    """Write header row if file does not exist. Uses exclusive-create to avoid races."""
     _ensure_dir(path)
-    df.to_csv(path, mode="a", header=not path.exists(), index=False)
+    try:
+        with path.open("x") as f:
+            f.write(",".join(columns) + "\n")
+    except FileExistsError:
+        pass  # another process beat us to it — header already there
+
+
+def _append_row(path: Path, columns: list[str], row: dict) -> None:
+    """Seed header once, then always append without header."""
+    _seed_header(path, columns)
+    pd.DataFrame([row]).to_csv(path, mode="a", header=False, index=False)
 
 
 def sync_demand_reading(reading: DemandReading) -> None:
     config = StateRegistry.from_model(reading.state)
-    _append_row(config.demand_csv_path, {
+    _append_row(config.demand_csv_path, DEMAND_COLUMNS, {
         "timestamp": reading.timestamp,
         "demand_mw": reading.demand_mw,
         "source": reading.source,
@@ -32,7 +48,7 @@ def sync_demand_reading(reading: DemandReading) -> None:
 
 def sync_prediction_record(record: PredictionRecord) -> None:
     config = StateRegistry.from_model(record.state)
-    _append_row(config.prediction_csv_path, {
+    _append_row(config.prediction_csv_path, PREDICTION_COLUMNS, {
         "timestamp": record.timestamp,
         "actual_demand": record.actual_demand,
         "predicted_demand": record.predicted_demand,
