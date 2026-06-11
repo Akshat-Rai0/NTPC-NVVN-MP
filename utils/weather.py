@@ -36,9 +36,18 @@ _DEFAULT_CITIES = {
     "singrauli": {"lat": 24.1998, "lon": 82.6754, "weight": 0.11504425},
 }
 
-_cache_session = requests_cache.CachedSession(".cache", expire_after=3600)
-_retry_session = retry(_cache_session, retries=5, backoff_factor=0.2)
-_openmeteo = openmeteo_requests.Client(session=_retry_session)
+_openmeteo = None
+_retry_session = None
+
+def _get_openmeteo_client():
+    global _openmeteo, _retry_session
+    if _openmeteo is None:
+        from django.conf import settings
+        cache_path = str(settings.BASE_DIR / ".cache")
+        _cache_session = requests_cache.CachedSession(cache_path, expire_after=3600)
+        _retry_session = retry(_cache_session, retries=5, backoff_factor=0.2)
+        _openmeteo = openmeteo_requests.Client(session=_retry_session)
+    return _openmeteo, _retry_session
 
 
 def _cities(config: StateConfig | None) -> dict:
@@ -54,6 +63,7 @@ def _timezone(config: StateConfig | None) -> str:
 
 
 def _get_minutely_forecast(lat: float, lon: float, forecast_points: int, timezone: str):
+    client, _ = _get_openmeteo_client()
     params = {
         "latitude": lat,
         "longitude": lon,
@@ -61,7 +71,7 @@ def _get_minutely_forecast(lat: float, lon: float, forecast_points: int, timezon
         "forecast_minutely_15": forecast_points,
         "timezone": timezone,
     }
-    response = _openmeteo.weather_api(OPENMETEO_URL, params=params)[0]
+    response = client.weather_api(OPENMETEO_URL, params=params)[0]
     m = response.Minutely15()
     values = m.Variables(0).ValuesAsNumpy()
     timestamps = pd.date_range(
@@ -79,6 +89,7 @@ def _get_hourly_fallback(
     timezone: str,
     forecast_points: int,
 ):
+    _, retry_session = _get_openmeteo_client()
     params = {
         "latitude": lat,
         "longitude": lon,
@@ -86,7 +97,7 @@ def _get_hourly_fallback(
         "forecast_days": forecast_days,
         "timezone": timezone,
     }
-    r = _retry_session.get(OPENMETEO_URL, params=params, timeout=20)
+    r = retry_session.get(OPENMETEO_URL, params=params, timeout=20)
     r.raise_for_status()
     data = r.json()
     times = pd.to_datetime(data["hourly"]["time"]).tz_localize(timezone)
