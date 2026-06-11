@@ -7,13 +7,25 @@ Public API:
     get_time_features() -> dict
 """
 
+import json
 import logging
 from datetime import datetime
+
 import holidays
 
 log = logging.getLogger(__name__)
 
-_india_holidays = holidays.India()
+
+def _is_holiday(dt: datetime) -> bool:
+    """
+    Check whether the given date is an Indian national holiday.
+
+    Creates the holiday calendar for the specific year to avoid
+    missing holidays when predictions are run across year boundaries.
+    """
+    h = holidays.India(years=dt.year)
+    return dt.date() in h
+
 
 # ── Minute quantisation ───────────────────────────────────────────────────────
 
@@ -47,14 +59,14 @@ def get_time_features(dt: datetime | None = None) -> dict:
     now = dt or datetime.now()
 
     features = {
-        "month":      now.month,
-        "holiday":    int(now.date() in _india_holidays),
+        "month": now.month,
+        "holiday": int(_is_holiday(now)),
         "is_weekend": int(now.weekday() >= 5),
-        "hour":       now.hour,
-        "minute":     _quantise_minute(now.minute),
+        "hour": now.hour,
+        "minute": _quantise_minute(now.minute),
     }
 
-    log.debug(f"Time features: {features}")
+    log.debug("Time features: %s", features)
     return features
 
 
@@ -62,5 +74,4 @@ def get_time_features(dt: datetime | None = None) -> dict:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    import json
     print(json.dumps(get_time_features(), indent=2))
