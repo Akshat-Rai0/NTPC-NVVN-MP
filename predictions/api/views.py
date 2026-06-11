@@ -72,7 +72,7 @@ def tomorrow_view(request, code: str):
         return JsonResponse({"error": "Failed to initialise forecaster"}, status=500)
     target = date.today() + timedelta(days=1)
     try:
-        predicted_points, _ = forecaster._predicted_points_for_day(target)
+        predicted_points = forecaster.forecast_day(target)
     except Exception as exc:
         log.error("tomorrow_view failed for %s: %s", code, exc)
         return JsonResponse({"error": "Forecast unavailable"}, status=500)
@@ -98,7 +98,7 @@ def forecast_view(request, code: str):
     if forecaster is None:
         return JsonResponse({"error": "Failed to initialise forecaster"}, status=500)
     try:
-        predicted_points, _ = forecaster._predicted_points_for_day(target)
+        predicted_points = forecaster.forecast_day(target)
     except Exception as exc:
         log.error("forecast_view failed for %s: %s", code, exc)
         return JsonResponse({"error": "Forecast unavailable"}, status=500)
@@ -108,7 +108,6 @@ def forecast_view(request, code: str):
         "date": target.isoformat(),
         "predicted": predicted_points,
     })
-
 
 @require_GET
 def history_view(request, code: str):

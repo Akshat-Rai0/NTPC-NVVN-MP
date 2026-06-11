@@ -149,6 +149,14 @@ class DayForecaster:
             for p in predicted_points
             if _align_15min(datetime.fromisoformat(p["t"])) > now_slot
         ]
+    def forecast_day(self, target: date) -> list[dict]:
+        """
+        Public API for full 96-slot forecast for any future date.
+        Returns list of {t, mw} dicts for all slots.
+        Use this in API views instead of _predicted_points_for_day().
+        """
+        points, _ = self._predicted_points_for_day(target)
+        return points
 
     def _build_metrics(
         self,
