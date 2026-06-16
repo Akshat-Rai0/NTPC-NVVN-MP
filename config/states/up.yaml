@@ -1,0 +1,33 @@
+code: up
+name: Uttar Pradesh
+merit_state_code: UP
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=UP
+model_path: models/up/lgbm_final.txt
+fallback_demand_mw: 32000
+timezone: Asia/Kolkata
+
+cities:
+  noida:
+    lat: 28.5355
+    lon: 77.3910
+    weight: 0.310
+
+  ghaziabad:
+    lat: 28.6692
+    lon: 77.4538
+    weight: 0.233
+
+  lucknow:
+    lat: 26.8467
+    lon: 80.9462
+    weight: 0.194
+
+  kanpur:
+    lat: 26.4499
+    lon: 80.3319
+    weight: 0.163
+
+  varanasi:
+    lat: 25.3176
+    lon: 82.9739
+    weight: 0.101
