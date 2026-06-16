@@ -372,7 +372,7 @@
     return `/api/states/${currentState}/history/?date=${datePicker.value}`;
   }
 
-  async function loadData() {
+  async function loadData(isTimerRefresh = false) {
     if (!currentState) return;
     if ((currentView === "future" || currentView === "history") && !datePicker.value) {
       return;
@@ -392,7 +392,9 @@
       updateMetrics(data);
       renderChart(data);
       lastUpdated.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
-      nextRefreshAt = Date.now() + REFRESH_MS;
+      if (isTimerRefresh) {
+        nextRefreshAt = Date.now() + REFRESH_MS;
+      }
     } catch (err) {
       console.error(err);
       lastUpdated.textContent = `Error: ${err.message}`;
@@ -430,7 +432,7 @@
   function setupRefreshTimer() {
     if (refreshTimer) clearInterval(refreshTimer);
     if (currentView === "today") {
-      refreshTimer = setInterval(loadData, REFRESH_MS);
+      refreshTimer = setInterval(() => loadData(true), REFRESH_MS);
     }
   }
 
