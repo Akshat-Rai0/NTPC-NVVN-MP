@@ -378,6 +378,7 @@
       return;
     }
 
+    console.log(`loadData called: isTimerRefresh=${isTimerRefresh}, state=${currentState}`);
     try {
       const res = await fetch(apiUrl());
       if (!res.ok) {
@@ -394,6 +395,9 @@
       lastUpdated.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
       if (isTimerRefresh) {
         nextRefreshAt = Date.now() + REFRESH_MS;
+        console.log(`Reset nextRefreshAt to ${new Date(nextRefreshAt).toLocaleTimeString()}`);
+      } else {
+        console.log(`Not resetting nextRefreshAt, current value: ${new Date(nextRefreshAt).toLocaleTimeString()}`);
       }
     } catch (err) {
       console.error(err);
