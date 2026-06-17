@@ -1,0 +1,33 @@
+code: ga
+name: Goa
+merit_state_code: GOA
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=GOA
+model_path: models/ga/lgbm_final.txt
+fallback_demand_mw: 850
+timezone: Asia/Kolkata
+
+cities:
+  panaji:
+    lat: 15.4909
+    lon: 73.8278
+    weight: 0.280000
+
+  vasco_da_gama:
+    lat: 15.3959
+    lon: 73.8156
+    weight: 0.240000
+
+  margao:
+    lat: 15.2993
+    lon: 73.9580
+    weight: 0.220000
+
+  ponda:
+    lat: 15.4020
+    lon: 74.0150
+    weight: 0.160000
+
+  mapusa:
+    lat: 15.5915
+    lon: 73.8087
+    weight: 0.100000

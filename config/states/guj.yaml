@@ -1,0 +1,33 @@
+code: gj
+name: Gujarat
+merit_state_code: GJD
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=GJT
+model_path: models/gj/lgbm_final.txt
+fallback_demand_mw: 22000
+timezone: Asia/Kolkata
+
+cities:
+  ahmedabad:
+    lat: 23.0225
+    lon: 72.5714
+    weight: 0.300000
+
+  surat:
+    lat: 21.1702
+    lon: 72.8311
+    weight: 0.270000
+
+  vadodara:
+    lat: 22.3072
+    lon: 73.1812
+    weight: 0.170000
+
+  rajkot:
+    lat: 22.3039
+    lon: 70.8022
+    weight: 0.140000
+
+  jamnagar:
+    lat: 22.4707
+    lon: 70.0577
+    weight: 0.120000
