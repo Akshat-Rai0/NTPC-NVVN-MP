@@ -1,6 +1,6 @@
 code: gj
 name: Gujarat
-merit_state_code: GJD
+merit_state_code: GJT
 merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=GJT
 model_path: models/gj/lgbm_final.txt
 fallback_demand_mw: 22000
