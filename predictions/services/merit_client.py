@@ -18,7 +18,10 @@ def fetch_current_demand(config: StateConfig) -> float | None:
     try:
         response = requests.get(config.merit_url, verify=False, timeout=10)
         response.raise_for_status()
-        raw = response.json()[0]["Demand"].replace(",", "")
+        demand_str = response.json()[0].get("Demand")
+        if demand_str is None:
+            raise ValueError("API returned None for Demand")
+        raw = str(demand_str).replace(",", "")
         value = float(raw)
         log.info("%s MERIT demand: %.0f MW", config.code, value)
         return value

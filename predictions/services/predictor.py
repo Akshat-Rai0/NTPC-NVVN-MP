@@ -49,11 +49,13 @@ def _load_xgboost_cached(model_path: str):
         # Try different encodings for pickle
         try:
             with open(model_path, 'rb') as f:
-                return pickle.load(f)
+                model_obj = pickle.load(f)
+                return model_obj['model'] if isinstance(model_obj, dict) and 'model' in model_obj else model_obj
         except:
             # Try with latin1 encoding (common for older pickle files)
             with open(model_path, 'rb') as f:
-                return pickle.load(f, encoding='latin1')
+                model_obj = pickle.load(f, encoding='latin1')
+                return model_obj['model'] if isinstance(model_obj, dict) and 'model' in model_obj else model_obj
 
 def _load_model(model_path: str, model_type: str = "lightgbm"):
     mtime = Path(model_path).stat().st_mtime
@@ -91,19 +93,32 @@ def _make_aware(dt: datetime) -> datetime:
 
 def _predict_row(row: dict, config: StateConfig) -> float:
     model = _load_model(str(config.absolute_model_path), config.model_type)
-    frame = pd.DataFrame([row])[FEATURE_COLS]
     
+    # Alias 'temp_weighted' to 'weighted_temp' for compatibility with various models
+    if "temp_weighted" in row:
+        row["weighted_temp"] = row["temp_weighted"]
+        
     if config.model_type == "lightgbm":
+        feature_cols = model.feature_name() if hasattr(model, 'feature_name') else FEATURE_COLS
+        frame = pd.DataFrame([row], columns=feature_cols)
         return float(model.predict(frame)[0])
     elif config.model_type == "xgboost":
         # Check if it's a sklearn interface model or native booster
+        if hasattr(model, 'feature_names_in_'):
+            feature_cols = model.feature_names_in_
+        elif hasattr(model, 'feature_names') and model.feature_names is not None:
+            feature_cols = model.feature_names
+        else:
+            feature_cols = FEATURE_COLS
+            
+        frame = pd.DataFrame([row], columns=feature_cols)
+        
         if hasattr(model, 'predict'):
             return float(model.predict(frame)[0])
         else:
             return float(model.predict(xgb.DMatrix(frame))[0])
     else:
         raise ValueError(f"Unsupported model type: {config.model_type}")
-
 
 class StatePredictor:
     def __init__(self, state_code: str):

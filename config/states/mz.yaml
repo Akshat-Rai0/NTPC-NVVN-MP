@@ -1,0 +1,30 @@
+code: mz
+name: Mizoram
+merit_state_code: MZM
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=MZM
+model_path: models/mz/mz_xgboost_model.pkl
+model_type: xgboost
+fallback_demand_mw: 180
+timezone: Asia/Kolkata
+
+cities:
+  aizawl:
+    lat: 23.7271
+    lon: 92.7176
+    weight: 0.55
+  lunglei:
+    lat: 22.8872
+    lon: 92.7422
+    weight: 0.18
+  champhai:
+    lat: 23.4561
+    lon: 93.3282
+    weight: 0.10
+  kolasib:
+    lat: 24.2239
+    lon: 92.6764
+    weight: 0.09
+  serchhip:
+    lat: 23.2988
+    lon: 92.8468
+    weight: 0.08
