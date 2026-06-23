@@ -20,6 +20,7 @@ class StateConfig:
     fallback_demand_mw: float
     timezone: str
     cities: dict[str, dict[str, float]]
+    model_type: str = "lightgbm"
     state_id: int | None = None
 
     @property
@@ -47,6 +48,7 @@ class StateRegistry:
             merit_state_code=state.merit_state_code,
             merit_url=state.merit_url,
             model_path=state.model_path,
+            model_type=getattr(state, "model_type", "lightgbm"),
             fallback_demand_mw=state.fallback_demand_mw,
             timezone=state.timezone,
             cities=state.cities,
@@ -86,4 +88,8 @@ class StateRegistry:
                 "is_active": data.get("is_active", True),
             },
         )
+        # Handle model_type if the field exists in the model
+        if hasattr(state, "model_type"):
+            state.model_type = data.get("model_type", "lightgbm")
+            state.save()
         return state

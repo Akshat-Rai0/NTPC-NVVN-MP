@@ -5,9 +5,11 @@ from __future__ import annotations
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
+import pickle
 
 import lightgbm as lgb
 import pandas as pd
+import xgboost as xgb
 from django.utils import timezone as django_tz
 
 from predictions.services.csv_sync import sync_demand_reading, sync_prediction_record
@@ -34,15 +36,41 @@ FEATURE_COLS = [
 _model_mtime: dict[str, float] = {}
 
 @lru_cache(maxsize=32)
-def _load_model_cached(model_path: str) -> lgb.Booster:
+def _load_lightgbm_cached(model_path: str) -> lgb.Booster:
     return lgb.Booster(model_file=model_path)
 
-def _load_model(model_path: str) -> lgb.Booster:
+@lru_cache(maxsize=32)
+def _load_xgboost_cached(model_path: str):
+    # Try loading as native XGBoost format first
+    try:
+        return xgb.Booster(model_file=model_path)
+    except:
+        # Fallback to pickle (for sklearn interface models)
+        # Try different encodings for pickle
+        try:
+            with open(model_path, 'rb') as f:
+                return pickle.load(f)
+        except:
+            # Try with latin1 encoding (common for older pickle files)
+            with open(model_path, 'rb') as f:
+                return pickle.load(f, encoding='latin1')
+
+def _load_model(model_path: str, model_type: str = "lightgbm"):
     mtime = Path(model_path).stat().st_mtime
-    if _model_mtime.get(model_path) != mtime:
-        _model_mtime[model_path] = mtime
-        _load_model_cached.cache_clear()
-    return _load_model_cached(model_path)
+    cache_key = f"{model_type}:{model_path}"
+    if _model_mtime.get(cache_key) != mtime:
+        _model_mtime[cache_key] = mtime
+        if model_type == "lightgbm":
+            _load_lightgbm_cached.cache_clear()
+        elif model_type == "xgboost":
+            _load_xgboost_cached.cache_clear()
+    
+    if model_type == "lightgbm":
+        return _load_lightgbm_cached(model_path)
+    elif model_type == "xgboost":
+        return _load_xgboost_cached(model_path)
+    else:
+        raise ValueError(f"Unsupported model type: {model_type}")
 
 
 def _to_local_naive(dt: datetime) -> datetime:
@@ -62,9 +90,19 @@ def _make_aware(dt: datetime) -> datetime:
 
 
 def _predict_row(row: dict, config: StateConfig) -> float:
-    model = _load_model(str(config.absolute_model_path))
+    model = _load_model(str(config.absolute_model_path), config.model_type)
     frame = pd.DataFrame([row])[FEATURE_COLS]
-    return float(model.predict(frame)[0])
+    
+    if config.model_type == "lightgbm":
+        return float(model.predict(frame)[0])
+    elif config.model_type == "xgboost":
+        # Check if it's a sklearn interface model or native booster
+        if hasattr(model, 'predict'):
+            return float(model.predict(frame)[0])
+        else:
+            return float(model.predict(xgb.DMatrix(frame))[0])
+    else:
+        raise ValueError(f"Unsupported model type: {config.model_type}")
 
 
 class StatePredictor:
