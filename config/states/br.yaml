@@ -1,0 +1,29 @@
+code: br
+name: Bihar
+merit_state_code: BHR
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=BHR
+model_path: models/br/lgbm_final.txt
+fallback_demand_mw: 5000
+timezone: Asia/Kolkata
+cities:
+  patna:
+    lat: 25.5941
+    lon: 85.1376
+    weight: 0.35
+  gaya:
+    lat: 24.7914
+    lon: 85.0000
+    weight: 0.20
+  bhagalpur:
+    lat: 25.2500
+    lon: 86.9833
+    weight: 0.15
+  muzaffarpur:
+    lat: 26.1167
+    lon: 85.3833
+    weight: 0.15
+  darbhanga:
+    lat: 26.1667
+    lon: 85.9000
+    weight: 0.15
+# perfect

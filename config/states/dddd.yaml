@@ -1,0 +1,37 @@
+code: dd
+name: Dadra and Nagar Haveli and Daman and Diu
+merit_state_codes:
+  - DNH
+  - DD
+merit_urls:
+  - https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=DNH
+  - https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=DND
+model_path: models/dd/lgbm_final.txt
+fallback_demand_mw: 1350
+timezone: Asia/Kolkata
+
+cities:
+  silvassa:
+    lat: 20.2739
+    lon: 73.0083
+    weight: 0.45
+
+  daman:
+    lat: 20.3974
+    lon: 72.8328
+    weight: 0.25
+
+  diu:
+    lat: 20.7141
+    lon: 70.9879
+    weight: 0.12
+
+  naroli:
+    lat: 20.2833
+    lon: 73.0500
+    weight: 0.10
+
+  khanvel:
+    lat: 20.2005
+    lon: 73.0165
+    weight: 0.08

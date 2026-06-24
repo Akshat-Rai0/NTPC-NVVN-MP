@@ -1,0 +1,35 @@
+code: cg
+name: Chhattisgarh
+merit_state_code: CTG
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=CTG
+model_path: models/cg/lgbm_final.txt
+fallback_demand_mw: 6000
+timezone: Asia/Kolkata
+
+cities:
+  raipur:
+    lat: 21.2514
+    lon: 81.6296
+    weight: 0.35
+
+  bilaspur:
+    lat: 22.0797
+    lon: 82.1409
+    weight: 0.25
+
+  durg:
+    lat: 21.1904
+    lon: 81.2849
+    weight: 0.18
+
+  korba:
+    lat: 22.3595
+    lon: 82.7501
+    weight: 0.12
+
+  jagdalpur:
+    lat: 19.0748
+    lon: 82.0080
+    weight: 0.10
+
+# perfect

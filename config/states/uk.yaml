@@ -1,0 +1,33 @@
+code: uk
+name: Uttarakhand
+merit_state_code: UTK
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=UTK
+model_path: models/uk/lgbm_final.txt
+fallback_demand_mw: 2600
+timezone: Asia/Kolkata
+
+cities:
+  dehradun:
+    lat: 30.3165
+    lon: 78.0322
+    weight: 0.35
+
+  haridwar:
+    lat: 29.9457
+    lon: 78.1642
+    weight: 0.25
+
+  haldwani:
+    lat: 29.2183
+    lon: 79.5120
+    weight: 0.18
+
+  rudrapur:
+    lat: 28.9875
+    lon: 79.4141
+    weight: 0.12
+
+  kashipur:
+    lat: 29.2132
+    lon: 78.9560
+    weight: 0.10

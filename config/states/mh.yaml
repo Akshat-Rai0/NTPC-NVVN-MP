@@ -1,0 +1,29 @@
+code: mh
+name: Maharashtra
+merit_state_code: MHA
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=MHA
+model_path: models/mh/lgbm_final.txt
+fallback_demand_mw: 25000
+timezone: Asia/Kolkata
+cities:
+  mumbai:
+    lat: 19.0760
+    lon: 72.8777
+    weight: 0.40
+  pune:
+    lat: 18.5204
+    lon: 73.8567
+    weight: 0.25
+  nagpur:
+    lat: 21.1458
+    lon: 79.0882
+    weight: 0.15
+  nashik:
+    lat: 19.9975
+    lon: 73.7898
+    weight: 0.10
+  aurangabad:
+    lat: 19.8762
+    lon: 75.3433
+    weight: 0.10
+# perfect 

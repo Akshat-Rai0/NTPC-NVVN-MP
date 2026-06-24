@@ -1,0 +1,29 @@
+code: ar
+name: Arunachal Pradesh
+merit_state_code: acp
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=acp
+model_path: models/ar/lgbm_final.txt
+fallback_demand_mw: 500
+timezone: Asia/Kolkata
+cities:
+  itanagar:
+    lat: 26.1484
+    lon: 92.7126
+    weight: 0.40
+  naharlagun:
+    lat: 26.1550
+    lon: 92.7000
+    weight: 0.25
+  pasighat:
+    lat: 28.0670
+    lon: 95.3290
+    weight: 0.15
+  tezu:
+    lat: 27.9333
+    lon: 96.0333
+    weight: 0.10
+  bomdila:
+    lat: 27.2500
+    lon: 92.4167
+    weight: 0.10
+#perfect 

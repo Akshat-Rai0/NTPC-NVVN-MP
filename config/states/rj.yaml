@@ -1,0 +1,29 @@
+code: rj
+name: Rajasthan
+merit_state_code: RJ
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=RJ
+model_path: models/rj/lgbm_final.txt
+fallback_demand_mw: 10000
+timezone: Asia/Kolkata
+cities:
+  jaipur:
+    lat: 26.9124
+    lon: 75.7873
+    weight: 0.35
+  jodhpur:
+    lat: 26.2389
+    lon: 73.0243
+    weight: 0.20
+  udaipur:
+    lat: 24.5854
+    lon: 73.7125
+    weight: 0.15
+  kota:
+    lat: 25.1381
+    lon: 75.8333
+    weight: 0.15
+  ajmer:
+    lat: 26.4499
+    lon: 74.6399
+    weight: 0.15
+# perfect

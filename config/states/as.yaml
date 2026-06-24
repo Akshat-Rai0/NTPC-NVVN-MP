@@ -1,0 +1,29 @@
+code: as
+name: Assam
+merit_state_code: asm
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=asm
+model_path: models/as/lgbm_final.txt
+fallback_demand_mw: 2000
+timezone: Asia/Kolkata
+cities:
+  guwahati:
+    lat: 26.1445
+    lon: 91.7362
+    weight: 0.45
+  dibrugarh:
+    lat: 27.4786
+    lon: 94.9118
+    weight: 0.20
+  silchar:
+    lat: 24.8333
+    lon: 92.7833
+    weight: 0.15
+  jorhat:
+    lat: 26.7667
+    lon: 94.2167
+    weight: 0.10
+  nagaon:
+    lat: 26.3500
+    lon: 92.6833
+    weight: 0.10
+# shape mismatch

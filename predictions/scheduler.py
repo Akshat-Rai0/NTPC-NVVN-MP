@@ -17,13 +17,11 @@ def start_scheduler() -> None:
     global _scheduler
 
     if not getattr(settings, "ENABLE_SCHEDULER", True):
-        return
-
-    import sys
-    if "runserver" in sys.argv and os.environ.get("RUN_MAIN") != "true":
+        log.info("Scheduler disabled via ENABLE_SCHEDULER setting")
         return
 
     if _scheduler is not None:
+        log.info("Scheduler already started")
         return
 
     from predictions.services.predictor import refresh_all_states
@@ -32,10 +30,10 @@ def start_scheduler() -> None:
     _scheduler.add_job(
         refresh_all_states,
         trigger="interval",
-        minutes=5,
+        minutes=15,
         id="refresh_demand",
         replace_existing=True,
         max_instances=1,
     )
     _scheduler.start()
-    log.info("Demand refresh scheduler started (every 5 minutes)")
+    log.info("Demand refresh scheduler started (every 15 minutes)")

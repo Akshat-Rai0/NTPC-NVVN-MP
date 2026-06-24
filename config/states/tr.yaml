@@ -1,0 +1,29 @@
+code: tr
+name: Tripura
+merit_state_code: TPA
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=TPA
+model_path: models/tr/lgbm_final.txt
+fallback_demand_mw: 300
+timezone: Asia/Kolkata
+cities:
+  agartala:
+    lat: 23.8315
+    lon: 91.2868
+    weight: 0.50
+  dharmanagar:
+    lat: 24.3833
+    lon: 92.1667
+    weight: 0.20
+  kailashahar:
+    lat: 24.3167
+    lon: 92.2500
+    weight: 0.15
+  belonia:
+    lat: 23.2500
+    lon: 91.4500
+    weight: 0.10
+  udaipur:
+    lat: 23.5500
+    lon: 91.4167
+    weight: 0.05
+#  perfect

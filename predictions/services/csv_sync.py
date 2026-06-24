@@ -39,7 +39,18 @@ def _append_row(path: Path, columns: list[str], row: dict) -> None:
 
 def sync_demand_reading(reading: DemandReading) -> None:
     config = StateRegistry.from_model(reading.state)
+    
+    # Sync to per-state CSV
     _append_row(config.demand_csv_path, DEMAND_COLUMNS, {
+        "timestamp": reading.timestamp,
+        "demand_mw": reading.demand_mw,
+        "source": reading.source,
+    })
+    
+    # Sync to global demand log CSV
+    from django.conf import settings
+    global_demand_path = settings.BASE_DIR / "data" / "demand_log.csv"
+    _append_row(global_demand_path, DEMAND_COLUMNS, {
         "timestamp": reading.timestamp,
         "demand_mw": reading.demand_mw,
         "source": reading.source,

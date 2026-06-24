@@ -1,0 +1,29 @@
+code: kl
+name: Kerala
+merit_state_code: KRL
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=KRL
+model_path: models/kl/lgbm_final.txt
+fallback_demand_mw: 4000
+timezone: Asia/Kolkata
+cities:
+  thiruvananthapuram:
+    lat: 8.5241
+    lon: 76.9366
+    weight: 0.30
+  kochi:
+    lat: 9.9312
+    lon: 76.2673
+    weight: 0.25
+  kozhikode:
+    lat: 11.2588
+    lon: 75.7804
+    weight: 0.20
+  kollam:
+    lat: 8.8804
+    lon: 76.5900
+    weight: 0.15
+  thrissur:
+    lat: 10.5276
+    lon: 76.2144
+    weight: 0.10
+# perfect 

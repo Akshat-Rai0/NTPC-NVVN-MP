@@ -1,0 +1,33 @@
+code: wb
+name: West Bengal
+merit_state_code: BGL
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=BGL
+model_path: models/wb/lgbm_final.txt
+fallback_demand_mw: 12000
+timezone: Asia/Kolkata
+
+cities:
+  kolkata:
+    lat: 22.5726
+    lon: 88.3639
+    weight: 0.40
+
+  howrah:
+    lat: 22.5958
+    lon: 88.2636
+    weight: 0.18
+
+  asansol:
+    lat: 23.6739
+    lon: 86.9524
+    weight: 0.17
+
+  siliguri:
+    lat: 26.7271
+    lon: 88.3953
+    weight: 0.15
+
+  durgapur:
+    lat: 23.5204
+    lon: 87.3119
+    weight: 0.10

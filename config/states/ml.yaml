@@ -1,0 +1,29 @@
+code: ml
+name: Meghalaya
+merit_state_code: MGA
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=MGA
+model_path: models/ml/lgbm_final.txt
+fallback_demand_mw: 400
+timezone: Asia/Kolkata
+cities:
+  shillong:
+    lat: 25.5689
+    lon: 91.8833
+    weight: 0.50
+  tura:
+    lat: 25.5167
+    lon: 90.2167
+    weight: 0.20
+  jowai:
+    lat: 25.4333
+    lon: 92.0333
+    weight: 0.15
+  baghmara:
+    lat: 25.2000
+    lon: 90.5500
+    weight: 0.10
+  nongpoh:
+    lat: 25.9000
+    lon: 91.9167
+    weight: 0.05
+# perfect 

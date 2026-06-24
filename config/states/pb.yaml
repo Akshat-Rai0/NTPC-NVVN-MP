@@ -1,0 +1,29 @@
+code: pb
+name: Punjab
+merit_state_code: PNB
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=PNB
+model_path: models/pb/lgbm_final.txt
+fallback_demand_mw: 8000
+timezone: Asia/Kolkata
+cities:
+  chandigarh:
+    lat: 30.7333
+    lon: 76.7794
+    weight: 0.35
+  ludhiana:
+    lat: 30.9000
+    lon: 75.8500
+    weight: 0.25
+  amritsar:
+    lat: 31.6340
+    lon: 74.8723
+    weight: 0.20
+  jalandhar:
+    lat: 31.3260
+    lon: 75.5762
+    weight: 0.10
+  patiala:
+    lat: 30.3398
+    lon: 76.3869
+    weight: 0.10
+# perfect

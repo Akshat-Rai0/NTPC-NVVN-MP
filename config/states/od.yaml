@@ -1,0 +1,29 @@
+code: od
+name: Odisha
+merit_state_code: ODI
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=ODI
+model_path: models/od/lgbm_final.txt
+fallback_demand_mw: 5000
+timezone: Asia/Kolkata
+cities:
+  bhubaneswar:
+    lat: 20.2961
+    lon: 85.8245
+    weight: 0.35
+  cuttack:
+    lat: 20.4625
+    lon: 85.8833
+    weight: 0.25
+  rourkela:
+    lat: 22.2544
+    lon: 84.8833
+    weight: 0.20
+  berhampur:
+    lat: 19.3167
+    lon: 84.7833
+    weight: 0.10
+  sambalpur:
+    lat: 21.4667
+    lon: 83.9833
+    weight: 0.10
+# perfect 

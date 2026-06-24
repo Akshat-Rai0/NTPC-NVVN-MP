@@ -1,0 +1,33 @@
+code: mn
+name: Manipur
+merit_state_code: MIP
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=MIP
+model_path: models/mn/lgbm_final.txt
+fallback_demand_mw: 250
+timezone: Asia/Kolkata
+
+cities:
+  imphal:
+    lat: 24.8170
+    lon: 93.9368
+    weight: 0.50
+
+  thoubal:
+    lat: 24.6381
+    lon: 93.9964
+    weight: 0.18
+
+  bishnupur:
+    lat: 24.6282
+    lon: 93.7666
+    weight: 0.12
+
+  churachandpur:
+    lat: 24.3335
+    lon: 93.6792
+    weight: 0.10
+
+  ukhrul:
+    lat: 25.1049
+    lon: 94.3627
+    weight: 0.10

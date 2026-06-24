@@ -1,0 +1,33 @@
+code: py
+name: Puducherry
+merit_state_code: PU
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=PU
+model_path: models/py/lgbm_final.txt
+fallback_demand_mw: 450
+timezone: Asia/Kolkata
+
+cities:
+  puducherry:
+    lat: 11.9416
+    lon: 79.8083
+    weight: 0.60
+
+  karaikal:
+    lat: 10.9254
+    lon: 79.8380
+    weight: 0.18
+
+  yanam:
+    lat: 16.7333
+    lon: 82.2167
+    weight: 0.10
+
+  mahe:
+    lat: 11.7002
+    lon: 75.5340
+    weight: 0.07
+
+  villianur:
+    lat: 11.9150
+    lon: 79.7577
+    weight: 0.05

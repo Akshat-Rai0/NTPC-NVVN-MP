@@ -1,0 +1,29 @@
+code: tn
+name: Tamil Nadu
+merit_state_code: TND
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=TND
+model_path: models/tn/lgbm_final.txt
+fallback_demand_mw: 15000
+timezone: Asia/Kolkata
+cities:
+  chennai:
+    lat: 13.0827
+    lon: 80.2707
+    weight: 0.40
+  coimbatore:
+    lat: 11.0168
+    lon: 76.9558
+    weight: 0.20
+  madurai:
+    lat: 9.9252
+    lon: 78.1198
+    weight: 0.15
+  tiruchirappalli:
+    lat: 10.7905
+    lon: 78.7047
+    weight: 0.15
+  salem:
+    lat: 11.6644
+    lon: 78.1460
+    weight: 0.10
+# perfect

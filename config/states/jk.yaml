@@ -1,0 +1,33 @@
+code: jk
+name: Jammu and Kashmir
+merit_state_code: JAK
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=JAK
+model_path: models/jk/lgbm_final.txt
+fallback_demand_mw: 2200
+timezone: Asia/Kolkata
+
+cities:
+  srinagar:
+    lat: 34.0837
+    lon: 74.7973
+    weight: 0.35
+
+  jammu:
+    lat: 32.7266
+    lon: 74.8570
+    weight: 0.35
+
+  anantnag:
+    lat: 33.7311
+    lon: 75.1542
+    weight: 0.12
+
+  baramulla:
+    lat: 34.1980
+    lon: 74.3636
+    weight: 0.10
+
+  kathua:
+    lat: 32.3694
+    lon: 75.5254
+    weight: 0.08

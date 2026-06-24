@@ -1,0 +1,29 @@
+code: dl
+name: Delhi
+merit_state_code: DL
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=DL
+model_path: models/dl/lgbm_final.txt
+fallback_demand_mw: 6000
+timezone: Asia/Kolkata
+cities:
+  new_delhi:
+    lat: 28.6139
+    lon: 77.2090
+    weight: 0.35
+  north_delhi:
+    lat: 28.7041
+    lon: 77.1025
+    weight: 0.20
+  south_delhi:
+    lat: 28.5192
+    lon: 77.2155
+    weight: 0.20
+  east_delhi:
+    lat: 28.6389
+    lon: 77.2936
+    weight: 0.15
+  west_delhi:
+    lat: 28.6448
+    lon: 77.1117
+    weight: 0.10
+# perfect

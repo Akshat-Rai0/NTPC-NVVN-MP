@@ -1,0 +1,29 @@
+code: hp
+name: Himachal Pradesh
+merit_state_code: HP
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=HP
+model_path: models/hp/lgbm_final.txt
+fallback_demand_mw: 1500
+timezone: Asia/Kolkata
+cities:
+  shimla:
+    lat: 31.1048
+    lon: 77.1734
+    weight: 0.35
+  dharamshala:
+    lat: 32.2194
+    lon: 76.3234
+    weight: 0.20
+  manali:
+    lat: 32.2396
+    lon: 77.1887
+    weight: 0.15
+  solan:
+    lat: 30.9086
+    lon: 77.0967
+    weight: 0.15
+  mandi:
+    lat: 31.7289
+    lon: 76.9289
+    weight: 0.15
+# shape mismatch

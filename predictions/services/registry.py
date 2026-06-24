@@ -16,11 +16,11 @@ class StateConfig:
     name: str
     merit_state_code: str
     merit_url: str
+    merit_urls: list[str] | None
     model_path: str
     fallback_demand_mw: float
     timezone: str
     cities: dict[str, dict[str, float]]
-    model_type: str = "lightgbm"
     state_id: int | None = None
 
     @property
@@ -47,8 +47,8 @@ class StateRegistry:
             name=state.name,
             merit_state_code=state.merit_state_code,
             merit_url=state.merit_url,
+            merit_urls=getattr(state, 'merit_urls', None),
             model_path=state.model_path,
-            model_type=getattr(state, "model_type", "lightgbm"),
             fallback_demand_mw=state.fallback_demand_mw,
             timezone=state.timezone,
             cities=state.cities,
@@ -75,12 +75,23 @@ class StateRegistry:
     @staticmethod
     def upsert_from_yaml(path: Path | str) -> State:
         data = StateRegistry.load_yaml(path)
+        
+        # Handle backward compatibility: if merit_urls is not present, use merit_url
+        merit_urls = data.get("merit_urls", None)
+        if not merit_urls and "merit_url" in data:
+            merit_urls = [data["merit_url"]]
+        
+        merit_state_codes = data.get("merit_state_codes", None)
+        if not merit_state_codes and "merit_state_code" in data:
+            merit_state_codes = data["merit_state_code"]
+        
         state, _ = State.objects.update_or_create(
             code=data["code"].lower(),
             defaults={
                 "name": data["name"],
-                "merit_state_code": data["merit_state_code"],
-                "merit_url": data["merit_url"],
+                "merit_state_code": merit_state_codes,
+                "merit_url": data.get("merit_url", ""),
+                "merit_urls": merit_urls,
                 "model_path": data["model_path"],
                 "fallback_demand_mw": data.get("fallback_demand_mw", 14500.0),
                 "timezone": data.get("timezone", "Asia/Kolkata"),
@@ -88,8 +99,4 @@ class StateRegistry:
                 "is_active": data.get("is_active", True),
             },
         )
-        # Handle model_type if the field exists in the model
-        if hasattr(state, "model_type"):
-            state.model_type = data.get("model_type", "lightgbm")
-            state.save()
         return state

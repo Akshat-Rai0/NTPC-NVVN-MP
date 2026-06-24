@@ -1,0 +1,29 @@
+code: tg
+name: Telangana
+merit_state_code: TLG
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=TLG
+model_path: models/tg/lgbm_final.txt
+fallback_demand_mw: 10000
+timezone: Asia/Kolkata
+cities:
+  hyderabad:
+    lat: 17.3850
+    lon: 78.4867
+    weight: 0.45
+  warangal:
+    lat: 17.9687
+    lon: 79.5941
+    weight: 0.20
+  nizamabad:
+    lat: 18.6725
+    lon: 78.0941
+    weight: 0.15
+  karimnagar:
+    lat: 18.4386
+    lon: 79.1287
+    weight: 0.10
+  ramagundam:
+    lat: 18.7500
+    lon: 79.4333
+    weight: 0.10
+# perfect

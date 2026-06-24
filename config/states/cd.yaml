@@ -1,0 +1,33 @@
+code: cd
+name: Chandigarh
+merit_state_code: CHG
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=CHG
+model_path: models/cd/lgbm_final.txt
+fallback_demand_mw: 450
+timezone: Asia/Kolkata
+
+cities:
+  chandigarh:
+    lat: 30.7333
+    lon: 76.7794
+    weight: 0.70
+
+  manimajra:
+    lat: 30.7286
+    lon: 76.8428
+    weight: 0.10
+
+  dhanas:
+    lat: 30.7642
+    lon: 76.7425
+    weight: 0.07
+
+  maloya:
+    lat: 30.7468
+    lon: 76.7226
+    weight: 0.07
+
+  hallomajra:
+    lat: 30.6994
+    lon: 76.8048
+    weight: 0.06

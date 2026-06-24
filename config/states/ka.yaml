@@ -1,0 +1,29 @@
+code: ka
+name: Karnataka
+merit_state_code: KRT
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=KRT
+model_path: models/ka/lgbm_final.txt
+fallback_demand_mw: 12000
+timezone: Asia/Kolkata
+cities:
+  bangalore:
+    lat: 12.9716
+    lon: 77.5946
+    weight: 0.40
+  mysore:
+    lat: 12.2958
+    lon: 76.6394
+    weight: 0.20
+  hubli:
+    lat: 15.3647
+    lon: 75.1240
+    weight: 0.15
+  mangalore:
+    lat: 12.9141
+    lon: 74.8560
+    weight: 0.15
+  belgaum:
+    lat: 15.8497
+    lon: 74.4977
+    weight: 0.10
+# perfect 

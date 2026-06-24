@@ -1,0 +1,29 @@
+code: sk
+name: Sikkim
+merit_state_code: SKM
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=SKM
+model_path: models/sk/lgbm_final.txt
+fallback_demand_mw: 300
+timezone: Asia/Kolkata
+cities:
+  gangtok:
+    lat: 27.3389
+    lon: 88.6065
+    weight: 0.50
+  namchi:
+    lat: 27.2000
+    lon: 88.3500
+    weight: 0.20
+  geyzing:
+    lat: 27.2833
+    lon: 88.4500
+    weight: 0.15
+  pemyangtse:
+    lat: 27.2833
+    lon: 88.4500
+    weight: 0.10
+  rangpo:
+    lat: 27.1500
+    lon: 88.5333
+    weight: 0.05
+# perfect

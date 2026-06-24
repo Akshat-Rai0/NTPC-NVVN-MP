@@ -1,0 +1,29 @@
+code: ap
+name: Andhra Pradesh
+merit_state_code: AP
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=AP
+model_path: models/ap/lgbm_final.txt
+fallback_demand_mw: 10000
+timezone: Asia/Kolkata
+cities:
+  visakhapatnam:
+    lat: 17.6868
+    lon: 83.2185
+    weight: 0.30
+  vijayawada:
+    lat: 16.5062
+    lon: 80.6480
+    weight: 0.25
+  guntur:
+    lat: 16.3067
+    lon: 80.4365
+    weight: 0.20
+  tirupati:
+    lat: 13.6288
+    lon: 79.4192
+    weight: 0.15
+  kakinada:
+    lat: 16.9891
+    lon: 82.2475
+    weight: 0.10
+# model shape mismatch

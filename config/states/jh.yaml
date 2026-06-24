@@ -1,0 +1,35 @@
+code: jh
+name: Jharkhand
+merit_state_code: JHK
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=JHK
+model_path: models/jh/lgbm_final.txt
+fallback_demand_mw: 3500
+timezone: Asia/Kolkata
+
+cities:
+  ranchi:
+    lat: 23.3441
+    lon: 85.3096
+    weight: 0.30
+
+  jamshedpur:
+    lat: 22.8046
+    lon: 86.2029
+    weight: 0.28
+
+  dhanbad:
+    lat: 23.7957
+    lon: 86.4304
+    weight: 0.20
+
+  bokaro:
+    lat: 23.6693
+    lon: 86.1511
+    weight: 0.12
+
+  deoghar:
+    lat: 24.4829
+    lon: 86.6947
+    weight: 0.10
+
+# perfect

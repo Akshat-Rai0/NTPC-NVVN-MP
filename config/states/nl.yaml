@@ -1,0 +1,28 @@
+code: nl
+name: Nagaland
+merit_state_code: NGD
+merit_url: https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=NGD
+model_path: models/nl/lgbm_final.txt
+fallback_demand_mw: 150
+timezone: Asia/Kolkata
+cities:
+  kohima:
+    lat: 25.6667
+    lon: 94.1167
+    weight: 0.50
+  dimapur:
+    lat: 25.9000
+    lon: 93.7333
+    weight: 0.30
+  mokokchung:
+    lat: 26.3333
+    lon: 94.5167
+    weight: 0.10
+  tuensang:
+    lat: 26.2500
+    lon: 94.8333
+    weight: 0.05
+  wokha:
+    lat: 26.1000
+    lon: 94.2500
+# perfect 

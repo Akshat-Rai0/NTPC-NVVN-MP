@@ -6,11 +6,8 @@ class State(models.Model):
     name = models.CharField(max_length=100)
     merit_state_code = models.CharField(max_length=10)
     merit_url = models.URLField(max_length=500)
+    merit_urls = models.JSONField(default=list, null=True, blank=True)
     model_path = models.CharField(max_length=500)
-    model_type = models.CharField(max_length=20, default="lightgbm", choices=[
-        ("lightgbm", "LightGBM"),
-        ("xgboost", "XGBoost"),
-    ])
     fallback_demand_mw = models.FloatField(default=14500.0)
     timezone = models.CharField(max_length=50, default="Asia/Kolkata")
     cities = models.JSONField(default=dict)
