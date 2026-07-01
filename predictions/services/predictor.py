@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
@@ -17,6 +18,9 @@ from states.models import DemandReading, PredictionRecord, State
 from utils.lag_store import get_lag_features, write_demand
 from utils.time_features import get_time_features
 from utils.weather import get_weighted_temp_at
+
+log = logging.getLogger(__name__)
+
 
 FEATURE_COLS = [
     "temp_weighted",
@@ -113,6 +117,26 @@ class StatePredictor:
             "predicted_demand": predicted,
             "features": row,
         }
+
+    def _live_reading_exists_for_current_slot(self) -> bool:
+        aligned = _make_aware(django_tz.now())
+        return DemandReading.objects.filter(
+            state=self.state,
+            timestamp=aligned,
+            source="api",
+        ).exists()
+
+    def ensure_live_demand_for_current_slot(self) -> None:
+        """Fetch live demand from Merit India only if we don't already have
+        a live reading for the current 15-min slot. Safe to call on every
+        page view — cheap DB check first, real HTTP fetch only once per
+        slot regardless of how many visitors hit the page in that window."""
+        if self._live_reading_exists_for_current_slot():
+            return
+        try:
+            self.predict_now()
+        except Exception as exc:
+            log.warning("Live demand fetch failed for %s: %s", self.config.code, exc)
 
     def predict_now(self) -> dict:
         fetch_time = django_tz.now()

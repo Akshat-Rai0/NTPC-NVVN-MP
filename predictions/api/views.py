@@ -56,6 +56,7 @@ def today_view(request, code: str):
     forecaster = _make_forecaster(code)
     if forecaster is None:
         return JsonResponse({"error": "Failed to initialise forecaster"}, status=500)
+    forecaster.predictor.ensure_live_demand_for_current_slot()
     try:
         return JsonResponse(forecaster.today_view())
     except Exception as exc:
