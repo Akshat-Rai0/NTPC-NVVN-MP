@@ -27,7 +27,7 @@ def fetch_current_demand(config: StateConfig) -> float | None:
     # 1. Helper function to route any Merit URL through Vercel
     def proxy_url(original_url):
         # REPLACE THIS with your actual Vercel deployment URL
-        PROXY = "https://your-vercel-proxy.vercel.app/api/proxy?StateCode="
+        PROXY = "https://vercel-proxy-deploy-xi.vercel.app/api/proxy?StateCode="
         return original_url.replace("https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=", PROXY)
 
     urls = getattr(config, 'merit_urls', None)
