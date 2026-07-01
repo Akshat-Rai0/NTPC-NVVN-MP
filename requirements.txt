@@ -22,3 +22,8 @@ holidays==0.88
 # Dev / Test
 pytest==9.0.2
 pytest-django==4.11.0
+
+
+#DEPLOY
+gunicorn==23.0.0
+whitenoise==6.11.0
