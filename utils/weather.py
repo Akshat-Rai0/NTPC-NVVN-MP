@@ -108,6 +108,20 @@ def _get_hourly_fallback(
     return minutely.index[:forecast_points], minutely["temperature"].values[:forecast_points]
 
 
+# Circuit breaker: once Open-Meteo confirms the daily quota is exhausted,
+# stop hitting the network entirely for a cooldown period. Without this,
+# every page view re-attempts (minutely + hourly, per city) and just
+# re-confirms the same "daily limit exceeded" response, wasting the
+# request against whatever's left of the quota and adding latency.
+_QUOTA_EXHAUSTED_UNTIL = 0.0
+_QUOTA_COOLDOWN_SECONDS = 900  # 15 min
+
+
+def _is_daily_quota_error(exc: Exception) -> bool:
+    msg = str(exc).lower()
+    return "daily api request limit" in msg or "429" in msg
+
+
 def _get_city_forecast(
     city: str,
     lat: float,
@@ -116,14 +130,23 @@ def _get_city_forecast(
     forecast_days: int,
     timezone: str,
 ):
+    global _QUOTA_EXHAUSTED_UNTIL
+    if time.monotonic() < _QUOTA_EXHAUSTED_UNTIL:
+        log.info("%s: skipping fetch, Open-Meteo daily quota cooldown active", city)
+        return None
     try:
         return _get_minutely_forecast(lat, lon, forecast_points, timezone)
     except Exception as exc:
         log.warning("%s: minutely failed (%s) — trying hourly fallback", city, exc)
+        if _is_daily_quota_error(exc):
+            _QUOTA_EXHAUSTED_UNTIL = time.monotonic() + _QUOTA_COOLDOWN_SECONDS
+            return None
     try:
         return _get_hourly_fallback(lat, lon, forecast_days, timezone, forecast_points)
     except Exception as exc:
         log.error("%s: both sources failed (%s)", city, exc)
+        if _is_daily_quota_error(exc):
+            _QUOTA_EXHAUSTED_UNTIL = time.monotonic() + _QUOTA_COOLDOWN_SECONDS
         return None
 
 

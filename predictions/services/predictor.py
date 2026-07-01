@@ -153,7 +153,7 @@ class StatePredictor:
             write_demand(aligned_naive, actual, source="api", config=self.config)
             sync_demand_reading(reading)
 
-        result = self.predict_at(fetch_time, allow_api=True)
+        result = self.predict_at(fetch_time, allow_api=True, forecast_days=2)
         record, _ = PredictionRecord.objects.update_or_create(
             state=self.state,
             timestamp=aligned,
