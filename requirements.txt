@@ -27,3 +27,6 @@ pytest-django==4.11.0
 #DEPLOY
 gunicorn==23.0.0
 whitenoise==6.11.0
+
+filelock==3.16.1
+matplotlib==3.10.0
