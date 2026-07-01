@@ -44,6 +44,8 @@ class Command(BaseCommand):
             demand_col = "hourly_demand_met_mw"
         elif "load_mw" in df.columns:
             demand_col = "load_mw"
+        elif "actual_demand" in df.columns:
+            demand_col = "actual_demand"
         else:
             demand_col = "demand_mw"
 
