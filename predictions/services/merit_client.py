@@ -24,36 +24,43 @@ _HEADERS = {
 
 
 def fetch_current_demand(config: StateConfig) -> float | None:
+    # 1. Helper function to route any Merit URL through Vercel
+    def proxy_url(original_url):
+        # REPLACE THIS with your actual Vercel deployment URL
+        PROXY = "https://vercel-proxy-deploy-xi.vercel.app/api/proxy?StateCode="
+        return original_url.replace("https://meritindia.in/StateWiseDetails/BindCurrentStateStatus?StateCode=", PROXY)
+
     urls = getattr(config, 'merit_urls', None)
+    
     if urls:
-        # Multiple URLs - fetch from all and sum
+        # Multiple URLs (e.g., Daman & Diu) - fetch from all and sum
         total = 0.0
         success_count = 0
         for url in urls:
+            safe_url = proxy_url(url)
             try:
-                response = requests.get(url, headers=_HEADERS, verify=False, timeout=10)
+                # Removed verify=False since Vercel has a valid SSL!
+                response = requests.get(safe_url, headers=_HEADERS, timeout=10)
                 response.raise_for_status()
-                raw = response.json()[0]["Demand"].replace(",", "")
-                value = float(raw)
+                value = float(response.json()[0]["Demand"].replace(",", ""))
                 total += value
                 success_count += 1
-                log.info("%s MERIT demand from %s: %.0f MW", config.code, url, value)
+                log.info("%s MERIT demand from %s: %.0f MW", config.code, safe_url, value)
             except Exception as exc:
-                log.warning("MERIT API failed for %s (%s): %s", config.code, url, exc)
+                log.warning("MERIT API failed for %s (%s): %s", config.code, safe_url, exc)
         
         if success_count > 0:
-            log.info("%s Total MERIT demand: %.0f MW (from %d sources)", config.code, total, success_count)
             return total
         else:
-            log.warning("All MERIT API calls failed for %s", config.code)
             return None
     else:
-        # Single URL - original behavior
+        # Single URL - standard behavior
+        safe_url = proxy_url(config.merit_url)
         try:
-            response = requests.get(config.merit_url, headers=_HEADERS, verify=False, timeout=10)
+            # Removed verify=False since Vercel has a valid SSL!
+            response = requests.get(safe_url, headers=_HEADERS, timeout=10)
             response.raise_for_status()
-            raw = response.json()[0]["Demand"].replace(",", "")
-            value = float(raw)
+            value = float(response.json()[0]["Demand"].replace(",", ""))
             log.info("%s MERIT demand: %.0f MW", config.code, value)
             return value
         except Exception as exc:

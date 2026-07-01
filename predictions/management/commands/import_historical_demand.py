@@ -34,15 +34,29 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING(f"CSV not found: {csv_path}"))
             return
 
-        df = pd.read_csv(csv_path, parse_dates=["datetime"])
+        df = pd.read_csv(csv_path, on_bad_lines='skip')
         if options["limit"]:
             df = df.tail(options["limit"])
 
+        time_col = "datetime" if "datetime" in df.columns else "timestamp"
+        
+        if "hourly_demand_met_mw" in df.columns:
+            demand_col = "hourly_demand_met_mw"
+        elif "load_mw" in df.columns:
+            demand_col = "load_mw"
+        elif "actual_demand" in df.columns:
+            demand_col = "actual_demand"
+        else:
+            demand_col = "demand_mw"
+
         created = 0
         for _, row in df.iterrows():
-            ts_naive = pd.Timestamp(row["datetime"]).floor("15min").to_pydatetime()
+            ts_val = pd.Timestamp(row[time_col]).floor("15min")
+            if ts_val.tzinfo is not None:
+                ts_val = ts_val.tz_convert(django_tz.get_current_timezone()).tz_localize(None)
+            ts_naive = ts_val.to_pydatetime()
             ts = django_tz.make_aware(ts_naive, django_tz.get_current_timezone())
-            demand = float(row["hourly_demand_met_mw"])
+            demand = float(row[demand_col])
             _, was_created = DemandReading.objects.update_or_create(
                 state=state,
                 timestamp=ts,
