@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 import os
+import time
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 from filelock import FileLock
@@ -83,7 +84,34 @@ def _csv_path(config: StateConfig | None) -> str:
     return _DEFAULT_CSV_PATH
 
 
+# In-process cache so a single day's forecast (96 slots) doesn't trigger
+# 96 separate DB queries / CSV reads for the same underlying demand log.
+# Short TTL, and write_demand() below explicitly invalidates the relevant
+# key so writes are visible immediately rather than waiting out the TTL.
+_LOAD_CACHE: dict[str, tuple[float, pd.DataFrame]] = {}
+_LOAD_CACHE_TTL_SECONDS = 30
+
+
+def _load_cache_key(config: StateConfig | None) -> str:
+    if config is not None and config.state_id:
+        return f"db:{config.state_id}"
+    return f"csv:{_csv_path(config)}"
+
+
 def _load(config: StateConfig | None = None) -> pd.DataFrame:
+    cache_key = _load_cache_key(config)
+    cached = _LOAD_CACHE.get(cache_key)
+    if cached is not None:
+        cached_at, cached_df = cached
+        if time.monotonic() - cached_at < _LOAD_CACHE_TTL_SECONDS:
+            return cached_df
+
+    df = _load_uncached(config)
+    _LOAD_CACHE[cache_key] = (time.monotonic(), df)
+    return df
+
+
+def _load_uncached(config: StateConfig | None = None) -> pd.DataFrame:
     path = _csv_path(config)
     if config is not None and config.state_id:
         try:
@@ -134,6 +162,7 @@ def write_demand(
         df = pd.concat([df, new_row], ignore_index=True)
         df.sort_values("timestamp", inplace=True)
         _save(df, config)
+    _LOAD_CACHE.pop(_load_cache_key(config), None)
 
 
 def _exact_lookup(df: pd.DataFrame, ts: pd.Timestamp) -> float | None:
