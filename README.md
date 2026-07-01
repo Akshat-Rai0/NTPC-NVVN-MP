@@ -1501,9 +1501,7 @@ When contributing to this project:
 4. Test with multiple states
 5. Verify backward compatibility
 
-## License
 
-This project is proprietary software for NTPC-NVVN-MP. All rights reserved.
 
 ## Support
 
