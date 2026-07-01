@@ -13,6 +13,15 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 log = logging.getLogger(__name__)
 
+_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+    ),
+    "Accept": "application/json, text/plain, */*",
+    "Referer": "https://meritindia.in/",
+}
+
 
 def fetch_current_demand(config: StateConfig) -> float | None:
     urls = getattr(config, 'merit_urls', None)
@@ -22,7 +31,7 @@ def fetch_current_demand(config: StateConfig) -> float | None:
         success_count = 0
         for url in urls:
             try:
-                response = requests.get(url, verify=False, timeout=10)
+                response = requests.get(url, headers=_HEADERS, verify=False, timeout=10)
                 response.raise_for_status()
                 raw = response.json()[0]["Demand"].replace(",", "")
                 value = float(raw)
@@ -41,7 +50,7 @@ def fetch_current_demand(config: StateConfig) -> float | None:
     else:
         # Single URL - original behavior
         try:
-            response = requests.get(config.merit_url, verify=False, timeout=10)
+            response = requests.get(config.merit_url, headers=_HEADERS, verify=False, timeout=10)
             response.raise_for_status()
             raw = response.json()[0]["Demand"].replace(",", "")
             value = float(raw)
