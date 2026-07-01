@@ -8,6 +8,7 @@ State-aware via cities dict in StateConfig.
 from __future__ import annotations
 
 import logging
+import time
 from datetime import datetime
 from typing import TYPE_CHECKING
 
@@ -126,12 +127,32 @@ def _get_city_forecast(
         return None
 
 
+# In-process cache so a single day's forecast (96 slots) doesn't trigger
+# 96 separate Open-Meteo round-trips + DataFrame builds. Keyed by the
+# request shape (cities + timezone + forecast_days), short TTL so it still
+# refreshes periodically rather than going stale for the process lifetime.
+_WEIGHTED_FORECAST_CACHE: dict[tuple, tuple[float, pd.DataFrame]] = {}
+_WEIGHTED_FORECAST_TTL_SECONDS = 300
+
+
 def get_weighted_temperature_forecast(
     config: StateConfig | None = None,
     forecast_days: int = 1,
 ) -> pd.DataFrame:
     cities = _cities(config)
     timezone = _timezone(config)
+
+    cache_key = (
+        tuple(sorted(cities.keys())),
+        timezone,
+        forecast_days,
+    )
+    cached = _WEIGHTED_FORECAST_CACHE.get(cache_key)
+    if cached is not None:
+        cached_at, cached_df = cached
+        if time.monotonic() - cached_at < _WEIGHTED_FORECAST_TTL_SECONDS:
+            return cached_df
+
     forecast_points = min(FORECAST_POINTS * forecast_days, 96 * forecast_days)
     successful = []
 
@@ -161,10 +182,12 @@ def get_weighted_temperature_forecast(
     for item in successful:
         weighted_temp += item["temps"] * (item["weight"] / total_weight)
 
-    return pd.DataFrame({
+    result_df = pd.DataFrame({
         "datetime": successful[0]["timestamps"],
         "weighted_apparent_temperature": weighted_temp,
     })
+    _WEIGHTED_FORECAST_CACHE[cache_key] = (time.monotonic(), result_df)
+    return result_df
 
 
 def get_current_weighted_temp(config: StateConfig | None = None) -> float:
