@@ -193,6 +193,29 @@ def _api_demand(config: StateConfig | None = None) -> float | None:
     return fetch_current_demand(cfg)
 
 
+def _same_time_of_day_lookup(
+    df: pd.DataFrame,
+    ts: pd.Timestamp,
+    max_days_back: int = 60,
+) -> float | None:
+    """Find the closest-dated historical reading at the SAME time-of-day
+    as the target. Used when we have no live/recent data at all — matching
+    time-of-day (demand has strong daily seasonality) is a much better
+    proxy than blindly reusing whatever the single latest row happens to
+    be, which could be from a completely unrelated hour."""
+    if df.empty:
+        return None
+    same_time = df[df["timestamp"].dt.time == ts.time()]
+    if same_time.empty:
+        return None
+    date_diff = (same_time["timestamp"].dt.normalize() - ts.normalize()).abs()
+    within_range = same_time[date_diff <= pd.Timedelta(days=max_days_back)]
+    if within_range.empty:
+        return None
+    closest_idx = date_diff[within_range.index].idxmin()
+    return float(same_time.loc[closest_idx, "demand_mw"])
+
+
 def _most_recent_demand(df: pd.DataFrame) -> float | None:
     if df.empty:
         return None
@@ -226,6 +249,10 @@ def _resolve_lag(
         api_val = _api_demand(config)
         if api_val is not None:
             return api_val * decay, f"api×{decay}"
+
+    same_time = _same_time_of_day_lookup(df, ts)
+    if same_time is not None:
+        return same_time * decay, f"same_time_of_day×{decay}"
 
     recent = _most_recent_demand(df)
     if recent is not None:
