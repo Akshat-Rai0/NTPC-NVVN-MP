@@ -38,6 +38,7 @@
   const infoTooltip = document.getElementById("info-tooltip");
   const chartPanel = document.getElementById("chart-panel");
   const metricsPanel = document.getElementById("metrics-panel");
+  const loadingSpinner = document.getElementById("loading-spinner");
 
   function toDisplayValue(mw) {
     return useMw ? mw : mw / 1000;
@@ -381,6 +382,7 @@
     }
 
     console.log(`loadData called: isTimerRefresh=${isTimerRefresh}, state=${currentState}`);
+    loadingSpinner.classList.remove("hidden");
     try {
       const res = await fetch(apiUrl());
       if (!res.ok) {
@@ -404,6 +406,8 @@
     } catch (err) {
       console.error(err);
       lastUpdated.textContent = `Error: ${err.message}`;
+    } finally {
+      loadingSpinner.classList.add("hidden");
     }
   }
 
