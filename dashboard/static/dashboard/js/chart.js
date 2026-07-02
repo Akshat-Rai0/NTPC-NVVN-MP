@@ -206,20 +206,22 @@
         });
       }
 
-      (data.prior_7_days || []).forEach((day, idx) => {
-        const prior = seriesFromPoints(day.points);
-        datasets.push({
-          label: day.label,
-          data: prior,
-          borderColor: `rgba(120, 120, 120, ${0.3 - idx * 0.025})`,
-          borderWidth: 1,
-          pointRadius: 0,
-          pointHoverRadius: 3,
-          fill: false,
-          tension: 0.35,
-          order: 3,
-        });
-      });
+
+      // Removed prior 7 days plots from today view
+      // (data.prior_7_days || []).forEach((day, idx) => {
+      //   const prior = seriesFromPoints(day.points);
+      //   datasets.push({
+      //     label: day.label,
+      //     data: prior,
+      //     borderColor: `rgba(120, 120, 120, ${0.3 - idx * 0.025})`,
+      //     borderWidth: 1,
+      //     pointRadius: 0,
+      //     pointHoverRadius: 3,
+      //     fill: false,
+      //     tension: 0.35,
+      //     order: 3,
+      //   });
+      // });
 
       if (data.peak && data.has_actual_data) {
         const peakIdx = slotIndex(data.peak.timestamp);
