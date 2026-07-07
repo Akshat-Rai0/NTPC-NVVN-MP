@@ -27,8 +27,9 @@
   let nextRefreshAt = Date.now() + REFRESH_MS;
   let slotLabels = [];
   let useMw = true;
+  let isModalOpen = false;
+  let allStatesData = [];
 
-  const stateSelect = document.getElementById("state-select");
   const datePicker = document.getElementById("date-picker");
   const chartTitle = document.getElementById("chart-title");
   const chartSubtitle = document.getElementById("chart-subtitle");
@@ -39,6 +40,12 @@
   const chartPanel = document.getElementById("chart-panel");
   const metricsPanel = document.getElementById("metrics-panel");
   const loadingSpinner = document.getElementById("loading-spinner");
+  const modalLoadingSpinner = document.getElementById("modal-loading-spinner");
+  const stateGrid = document.getElementById("state-grid");
+  const modal = document.getElementById("modal");
+  const modalOverlay = document.getElementById("modal-overlay");
+  const modalClose = document.getElementById("modal-close");
+  const modalTitle = document.getElementById("modal-title");
 
   function toDisplayValue(mw) {
     return useMw ? mw : mw / 1000;
@@ -347,18 +354,81 @@
     });
   }
 
+  function getDiffClass(diffPct) {
+    if (diffPct === null || diffPct === undefined) return "diff-none";
+    if (diffPct < 5) return "diff-good";
+    if (diffPct < 10) return "diff-warning";
+    return "diff-bad";
+  }
+
+  function renderStateCard(state, todayData) {
+    const card = document.createElement("div");
+    card.className = "state-card";
+    card.dataset.code = state.code;
+    card.dataset.name = state.name;
+
+    const diffPct = todayData?.avg_diff_pct;
+    const diffMw = todayData?.avg_diff_mw;
+    const diffClass = getDiffClass(diffPct);
+
+    let diffText = "No data yet";
+    if (diffPct !== null && diffPct !== undefined) {
+      diffText = `${diffPct.toFixed(2)}%`;
+    }
+
+    card.innerHTML = `
+      <div class="state-card-name">${state.name}</div>
+      <div class="state-card-diff">
+        <span class="state-card-diff-value ${diffClass}">${diffText}</span>
+        <span style="font-size: 0.75rem; color: var(--muted);">
+          ${diffMw !== null && diffMw !== undefined ? `(${diffMw.toFixed(0)} MW)` : ""}
+        </span>
+      </div>
+    `;
+
+    card.addEventListener("click", () => openModal(state.code, state.name));
+    return card;
+  }
+
   async function fetchStates() {
     const res = await fetch("/api/states/");
     if (!res.ok) throw new Error(`States API returned ${res.status}`);
     const data = await res.json();
     if (!data.states || !data.states.length) throw new Error("No active states returned");
-    stateSelect.innerHTML = "";
-    data.states.forEach((s) => {
-      const opt = document.createElement("option");
-      opt.value = s.code;
-      opt.textContent = s.name;
-      stateSelect.appendChild(opt);
+    
+    // Fetch today's data for all states in parallel
+    const todayPromises = data.states.map(async (state) => {
+      try {
+        const todayRes = await fetch(`/api/states/${state.code}/today/`);
+        if (todayRes.ok) {
+          const todayData = await todayRes.json();
+          return { code: state.code, data: todayData };
+        }
+        return { code: state.code, data: null };
+      } catch (err) {
+        console.error(`Failed to fetch today data for ${state.code}:`, err);
+        return { code: state.code, data: null };
+      }
     });
+
+    const todayResults = await Promise.all(todayPromises);
+    const todayDataMap = {};
+    todayResults.forEach((result) => {
+      todayDataMap[result.code] = result.data;
+    });
+
+    allStatesData = data.states.map((state) => ({
+      ...state,
+      todayData: todayDataMap[state.code],
+    }));
+
+    // Render state grid
+    stateGrid.innerHTML = "";
+    allStatesData.forEach((state) => {
+      const card = renderStateCard(state, state.todayData);
+      stateGrid.appendChild(card);
+    });
+
     currentState = data.states[0]?.code;
   }
 
@@ -375,6 +445,25 @@
     return `/api/states/${currentState}/history/?date=${datePicker.value}`;
   }
 
+  function openModal(stateCode, stateName) {
+    currentState = stateCode;
+    modalTitle.textContent = stateName;
+    modal.classList.remove("hidden");
+    isModalOpen = true;
+    currentView = "today";
+    setupDatePicker();
+    setupRefreshTimer();
+    loadData();
+  }
+
+  function closeModal() {
+    modal.classList.add("hidden");
+    isModalOpen = false;
+    currentState = null;
+    if (refreshTimer) clearInterval(refreshTimer);
+    destroyChart();
+  }
+
   async function loadData(isTimerRefresh = false) {
     if (!currentState) return;
     if ((currentView === "future" || currentView === "history") && !datePicker.value) {
@@ -382,7 +471,8 @@
     }
 
     console.log(`loadData called: isTimerRefresh=${isTimerRefresh}, state=${currentState}`);
-    loadingSpinner.classList.remove("hidden");
+    const spinner = isModalOpen ? modalLoadingSpinner : loadingSpinner;
+    spinner.classList.remove("hidden");
     try {
       const res = await fetch(apiUrl());
       if (!res.ok) {
@@ -407,7 +497,7 @@
       console.error(err);
       lastUpdated.textContent = `Error: ${err.message}`;
     } finally {
-      loadingSpinner.classList.add("hidden");
+      spinner.classList.add("hidden");
     }
   }
 
@@ -441,9 +531,44 @@
 
   function setupRefreshTimer() {
     if (refreshTimer) clearInterval(refreshTimer);
-    if (currentView === "today") {
+    if (currentView === "today" && isModalOpen) {
       refreshTimer = setInterval(() => loadData(true), REFRESH_MS);
     }
+  }
+
+  async function refreshGridData() {
+    // Refresh all state cards with latest data
+    const todayPromises = allStatesData.map(async (state) => {
+      try {
+        const todayRes = await fetch(`/api/states/${state.code}/today/`);
+        if (todayRes.ok) {
+          const todayData = await todayRes.json();
+          return { code: state.code, data: todayData };
+        }
+        return { code: state.code, data: null };
+      } catch (err) {
+        console.error(`Failed to fetch today data for ${state.code}:`, err);
+        return { code: state.code, data: null };
+      }
+    });
+
+    const todayResults = await Promise.all(todayPromises);
+    const todayDataMap = {};
+    todayResults.forEach((result) => {
+      todayDataMap[result.code] = result.data;
+    });
+
+    // Update existing cards
+    allStatesData.forEach((state) => {
+      state.todayData = todayDataMap[state.code];
+      const card = stateGrid.querySelector(`[data-code="${state.code}"]`);
+      if (card) {
+        const newCard = renderStateCard(state, state.todayData);
+        card.replaceWith(newCard);
+      }
+    });
+
+    lastUpdated.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
   }
 
   function setupCountdown() {
@@ -494,11 +619,6 @@
     });
   });
 
-  stateSelect.addEventListener("change", () => {
-    currentState = stateSelect.value;
-    loadData();
-  });
-
   datePicker.addEventListener("change", loadData);
 
   document.getElementById("btn-info").addEventListener("click", () => {
@@ -512,19 +632,22 @@
     if (chart) chart.resize();
   });
 
+  modalClose.addEventListener("click", closeModal);
+  modalOverlay.addEventListener("click", closeModal);
+
   async function init() {
     try {
       await fetchStates();
+      loadingSpinner.classList.add("hidden");
     } catch (err) {
+      loadingSpinner.classList.add("hidden");
       lastUpdated.textContent = `API unavailable: ${err.message}`;
-      chartTitle.textContent = "Dashboard unavailable";
-      if (chartSubtitle) chartSubtitle.textContent = "Check that the Django server is running";
       return;
     }
-    setupDatePicker();
-    setupRefreshTimer();
+    
+    // Set up periodic refresh for grid data
+    setInterval(refreshGridData, REFRESH_MS);
     setupCountdown();
-    await loadData();
   }
 
   init();

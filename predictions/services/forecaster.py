@@ -232,6 +232,22 @@ class DayForecaster:
 
         metrics = self._build_metrics(today, actual_points, predicted_points, temps)
 
+        # Calculate average difference between actual and predicted
+        pred_map = {p["t"]: p["mw"] for p in predicted_points}
+        diff_pairs = []
+        for ap in actual_points:
+            pred_mw = pred_map.get(ap["t"])
+            if pred_mw is not None and ap["mw"] > 0:
+                diff_mw = abs(ap["mw"] - pred_mw)
+                diff_pct = diff_mw / ap["mw"] * 100
+                diff_pairs.append((diff_mw, diff_pct))
+        
+        avg_diff_mw = None
+        avg_diff_pct = None
+        if diff_pairs:
+            avg_diff_mw = sum(d[0] for d in diff_pairs) / len(diff_pairs)
+            avg_diff_pct = sum(d[1] for d in diff_pairs) / len(diff_pairs)
+
         if actual_points:
             peak_point = max(actual_points, key=lambda p: p["mw"])
             peak = {"value_mw": peak_point["mw"], "timestamp": peak_point["t"]}
@@ -275,6 +291,8 @@ class DayForecaster:
             "metrics": metrics,
             "prior_7_days": prior_7_days,
             "has_actual_data": len(actual_points) > 0,
+            "avg_diff_mw": round(avg_diff_mw, 2) if avg_diff_mw is not None else None,
+            "avg_diff_pct": round(avg_diff_pct, 2) if avg_diff_pct is not None else None,
         }
 
     def history_view(self, target: date) -> dict:
